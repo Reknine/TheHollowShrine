@@ -25,9 +25,10 @@ protected:
 	// Called when the game starts
 	virtual void BeginPlay() override;
 
-	UFUNCTION(BlueprintCallable)
+	UPROPERTY(EditAnywhere)
+	double BreakDistance = 1000;
+
 	void StartLockon(float Radius = 750.0f);
-	
 	void EndLockon();
 
 	UFUNCTION(BlueprintCallable)

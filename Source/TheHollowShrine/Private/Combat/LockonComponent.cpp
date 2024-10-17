@@ -7,6 +7,7 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Interfaces/Enemy.h"
 
 // Sets default values for this component's properties
 ULockonComponent::ULockonComponent()
@@ -47,9 +48,11 @@ void ULockonComponent::StartLockon(float Radius)
 		Sphere,
 		IgnoreParams
 		);
-	
+
+	// check, otherwise crash if no target in range
 	if (!bHasFoundTarget) { return; }
 
+	if (!OutResult.GetActor()->Implements<UEnemy>()) { return;}
 	CurrentTargetActor = OutResult.GetActor();
 
 	Controller->SetIgnoreLookInput(true);
@@ -88,7 +91,6 @@ void ULockonComponent::ToggleLockon(float Radius)
 	}
 }
 
-// Called every frame
 void ULockonComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
@@ -98,6 +100,13 @@ void ULockonComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 	FVector CurrentLocation = OwnerRef->GetActorLocation();
 	FVector TargetLocation = CurrentTargetActor->GetActorLocation();
 
+	double Distance = FVector::Distance(CurrentLocation, TargetLocation);
+	if (Distance >= BreakDistance)
+	{
+		EndLockon();
+		return;
+	}
+
 	TargetLocation.Z -= 125;
 	FRotator NewRotation = UKismetMathLibrary::FindLookAtRotation(
 		CurrentLocation,
@@ -105,5 +114,6 @@ void ULockonComponent::TickComponent(float DeltaTime, ELevelTick TickType, FActo
 		);
 
 	Controller->SetControlRotation(NewRotation);
+
 }
 

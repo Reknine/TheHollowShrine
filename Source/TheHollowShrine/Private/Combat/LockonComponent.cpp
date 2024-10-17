@@ -60,6 +60,8 @@ void ULockonComponent::StartLockon(float Radius)
 	MovementComponent->bUseControllerDesiredRotation = true;
 
 	SpringArmComponent->TargetOffset = FVector(0, 0, 100);
+
+	IEnemy::Execute_OnSelect(CurrentTargetActor);
 	
 	UE_LOG(
 		LogTemp,
@@ -71,9 +73,10 @@ void ULockonComponent::StartLockon(float Radius)
 
 void ULockonComponent::EndLockon()
 {
+	IEnemy::Execute_OnDeselect(CurrentTargetActor);
 	CurrentTargetActor = nullptr;
-	MovementComponent->bUseControllerDesiredRotation = true;
-	MovementComponent->bOrientRotationToMovement = false;
+	MovementComponent->bOrientRotationToMovement = true;
+	MovementComponent->bUseControllerDesiredRotation = false;
 	SpringArmComponent->TargetOffset = FVector(0, 0, 0);
 
 	Controller->ResetIgnoreLookInput();
